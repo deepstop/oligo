@@ -75,7 +75,7 @@ getProbeInfo <- function(object, field, probeType='pm', target='core',
                        fields)
         tables <- paste('pmfeature, featureSet,', mpsTable)
         sql <- paste('SELECT', fields, 'FROM', tables,
-                     'WHERE ', probeTable, '.fsetid=featureSet.fsetid AND',
+                     'WHERE ', paste(probeTable,".fsetid=featureSet.fsetid AND",sep=""),
                      paste('featureSet.fsetid=', mpsTable, '.fsetid', sep=''))
         rm(fields, mpsTable, tables)
     }else{
