@@ -55,7 +55,7 @@ getProbeInfo <- function(object, field, probeType='pm', target='core',
     conn <- db(get(pkgName))
 
     ## With ST arrays:
-    ## 1) fsetid is both fsetid and man_fsetid
+    ## 1) fsetid and man_fsetid can be different
     ## 2) transcript_cluster_id is in both *mps and featureSet tables
     ## 3) chrom/level/type_dict tables exist
     isST <- class(get(pkgName)) %in% c('ExonFeatureSet', 'GeneFeatureSet', 'AffyExonPDInfo', 'AffyGenePDInfo')
@@ -67,7 +67,7 @@ getProbeInfo <- function(object, field, probeType='pm', target='core',
         fields <- unique(c('fid', 'meta_fsetid as man_fsetid', field))
         ## pmfeature.fsetid probably shouldnt be used here, as it's != 'probeset'
         ## fields[fields == 'fsetid'] <- 'pmfeature.fsetid'
-        fields[fields == 'fsetid'] <- 'meta_fsetid as fsetid'
+        fields[fields == 'fsetid'] <- paste(probeTable,".fsetid as fsetid",sep="")
         fields <- paste(fields, collapse=', ')
         mpsTable <- paste(target, 'mps', sep='_')
         fields <- gsub('transcript_cluster_id',
@@ -75,7 +75,7 @@ getProbeInfo <- function(object, field, probeType='pm', target='core',
                        fields)
         tables <- paste('pmfeature, featureSet,', mpsTable)
         sql <- paste('SELECT', fields, 'FROM', tables,
-                     'WHERE pmfeature.fsetid=featureSet.fsetid AND',
+                     'WHERE ', probeTable, '.fsetid=featureSet.fsetid AND',
                      paste('featureSet.fsetid=', mpsTable, '.fsetid', sep=''))
         rm(fields, mpsTable, tables)
     }else{
